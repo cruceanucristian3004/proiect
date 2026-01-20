@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nova-resells-db
+    environment:
+      POSTGRES_USER: myappuser
+      POSTGRES_PASSWORD: 134Zxdfgh
+      POSTGRES_DB: myapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./backend/src/db/migration-add-username.sql:/docker-entrypoint-initdb.d/02-migration.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myappuser -d myapp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nova-resells-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nova-resells-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://myappuser:134Zxdfgh@postgres:5432/myapp
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      UPLOAD_DIR: ./uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nova-resells-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nova-resells-frontend
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - nova-resells-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  nova-resells-network:
+    driver: bridge

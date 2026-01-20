@@ -39,11 +39,36 @@ proiecte/
 
 ## Setup
 
-### Backend
+### Opțiunea 1: Docker (Recomandat pentru prezentare) 🐳
+
+Cel mai simplu mod de a rula aplicația - totul este configurat automat!
+
+1. **Instalează Docker** ([Download Docker](https://www.docker.com/get-started))
+
+2. **Clonează repository-ul**:
+```bash
+git clone https://github.com/AntraXPastiluta/proiect-webapp.git
+cd proiect-webapp
+```
+
+3. **Pornește toate serviciile**:
+```bash
+docker-compose up --build
+```
+
+4. **Accesează aplicația**:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:3000
+
+**Ghid complet Docker**: Vezi [DOCKER.md](./DOCKER.md) pentru detalii.
+
+### Opțiunea 2: Setup Manual
+
+#### Backend
 
 1. Instaleaza dependintele:
 ```bash
-cd bakcend
+cd backend
 npm install
 ```
 
@@ -51,12 +76,14 @@ npm install
    - Creeaza o baza de date PostgreSQL
    - Ruleaza schema SQL pentru a crea tabelele:
    ```bash
+   npm run init-db
+   # SAU manual:
    psql -U your_user -d your_database -f src/db/schema.sql
+   psql -U your_user -d your_database -f src/db/migration-add-username.sql
    ```
 
 3. Configuraza variabilele de mediu:
-   - Creeaza un fisier `.env` in folderul `bakcend/`
-   - Copiaza continutul din `.env.example` si modifica valorile:
+   - Creeaza un fisier `.env` in folderul `backend/`:
    ```
    PORT=3000
    DATABASE_URL=postgresql://user:password@localhost:5432/myapp
@@ -72,7 +99,7 @@ npm run dev
 
 Serverul va rula pe `http://localhost:3000`
 
-### Frontend
+#### Frontend
 
 1. Instaleaza dependintele:
 ```bash

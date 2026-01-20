@@ -1,5 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getImageUrl } from '../utils/config';
 import './Layout.css';
 
 export default function Layout() {
@@ -30,7 +31,7 @@ export default function Layout() {
                     <Link to="/profile" className="user-avatar-link">
                       {user?.avatar_url ? (
                         <img
-                          src={`http://localhost:3000${user.avatar_url}`}
+                          src={getImageUrl(user.avatar_url) || ''}
                           alt={user?.username || user?.name}
                           className="user-avatar"
                         />
@@ -62,7 +63,7 @@ export default function Layout() {
       </main>
       <footer className="footer">
         <div className="container">
-          <p>&copy; 2024 Nova Resells. Toate drepturile rezervate.</p>
+          <p>&copy; 2026 Nova Resells. Toate drepturile rezervate.</p>
         </div>
       </footer>
     </div>

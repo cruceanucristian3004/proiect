@@ -71,7 +71,10 @@ export default function Home() {
         <div className="container">
           <div className="hero">
             <h1 className="hero-title">
-              <span className="gradient-text">Nova Resells</span>
+              <span className="graffiti-text">
+                <span className="graffiti-word graffiti-nova">NOVA</span>
+                <span className="graffiti-word graffiti-resells">RESELLS</span>
+              </span>
             </h1>
             <p className="hero-subtitle">
               Platforma ta preferată pentru resells! Cumpără și vinde produse cu încredere. 

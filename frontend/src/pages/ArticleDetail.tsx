@@ -2,18 +2,25 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { articlesAPI, Article } from '../api/articles';
+import { getImageUrl } from '../utils/config';
+import { useProtectedRoute } from '../hooks/useProtectedRoute';
 import './Detail.css';
 
 export default function ArticleDetail() {
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  
+  // Necesită autentificare
+  useProtectedRoute();
 
   useEffect(() => {
-    if (id) loadArticle();
-  }, [id]);
+    if (id && isAuthenticated) {
+      loadArticle();
+    }
+  }, [id, isAuthenticated]);
 
   const loadArticle = async () => {
     try {
@@ -52,7 +59,7 @@ export default function ArticleDetail() {
         <div className="detail-card">
           {article.image_url && (
             <img
-              src={`http://localhost:3000${article.image_url}`}
+              src={getImageUrl(article.image_url) || ''}
               alt={article.title}
               className="detail-image"
             />
@@ -62,10 +69,26 @@ export default function ArticleDetail() {
             <div className="detail-description">
               <p style={{ whiteSpace: 'pre-wrap' }}>{article.content}</p>
             </div>
-            <p className="detail-meta">
-              Scris de {article.user_name} pe{' '}
-              {new Date(article.created_at).toLocaleDateString('ro-RO')}
-            </p>
+            <div className="detail-meta">
+              <div className="detail-author">
+                {article.user_avatar_url && (
+                  <img
+                    src={getImageUrl(article.user_avatar_url) || ''}
+                    alt={article.user_username || article.user_name}
+                    className="author-avatar-large"
+                  />
+                )}
+                <div className="author-info">
+                  <span className="author-label">Scris de</span>
+                  <strong className="author-name">
+                    {article.user_username || article.user_name}
+                  </strong>
+                  <span className="author-date">
+                    pe {new Date(article.created_at).toLocaleDateString('ro-RO')}
+                  </span>
+                </div>
+              </div>
+            </div>
             {user && (article.user_id === user.id || isAdmin) && (
               <div className="detail-actions">
                 <Link

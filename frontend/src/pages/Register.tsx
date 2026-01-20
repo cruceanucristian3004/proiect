@@ -22,7 +22,11 @@ export default function Register() {
       await register(email, password, name, username || undefined);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'A apărut o eroare la înregistrare');
+      // Extrage mesajul de eroare din răspuns
+      const errorMessage = err.response?.data?.error || 
+                          err.message || 
+                          'A apărut o eroare la înregistrare. Te rugăm să încerci din nou.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

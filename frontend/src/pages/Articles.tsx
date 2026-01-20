@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { articlesAPI, Article } from '../api/articles';
+import { getImageUrl } from '../utils/config';
+import { useProtectedRoute } from '../hooks/useProtectedRoute';
 import './Articles.css';
 
 export default function Articles() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated, isAdmin, user } = useAuth();
+  
+  // Necesită autentificare pentru a vedea articolele
+  useProtectedRoute();
 
   useEffect(() => {
-    loadArticles();
-  }, []);
+    if (isAuthenticated) {
+      loadArticles();
+    }
+  }, [isAuthenticated]);
 
   const loadArticles = async () => {
     try {
@@ -66,7 +73,7 @@ export default function Articles() {
               <article key={article.id} className="article-card">
                 {article.image_url && (
                   <img
-                    src={`http://localhost:3000${article.image_url}`}
+                    src={getImageUrl(article.image_url) || ''}
                     alt={article.title}
                     className="article-image"
                   />
@@ -79,7 +86,16 @@ export default function Articles() {
                     {article.content.substring(0, 150)}...
                   </p>
                   <div className="article-meta">
-                    <span>de {article.user_name}</span>
+                    {article.user_avatar_url && (
+                      <img
+                        src={getImageUrl(article.user_avatar_url) || ''}
+                        alt={article.user_username || article.user_name}
+                        className="author-avatar"
+                      />
+                    )}
+                    <span>
+                      de <strong>{article.user_username || article.user_name}</strong>
+                    </span>
                     <span>•</span>
                     <span>{new Date(article.created_at).toLocaleDateString('ro-RO')}</span>
                   </div>

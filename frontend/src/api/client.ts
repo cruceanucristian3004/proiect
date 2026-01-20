@@ -34,9 +34,15 @@ apiClient.interceptors.response.use(
     fetch('http://127.0.0.1:7242/ingest/a8ccfd05-efc0-4883-97e2-f268560c8741',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'frontend/src/api/client.ts:28',message:'API error occurred',data:{status:error.response?.status,message:error.message,url:error.config?.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
     // #endregion
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/register';
+      
+      // Nu redirecționa dacă suntem deja pe pagina de login/register
+      // pentru a permite afișarea mesajelor de eroare
+      if (!isAuthPage) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

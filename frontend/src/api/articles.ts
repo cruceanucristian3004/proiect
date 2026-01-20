@@ -7,6 +7,9 @@ export interface Article {
   image_url?: string;
   user_id: string;
   user_name?: string;
+  user_username?: string;
+  user_email?: string;
+  user_avatar_url?: string;
   created_at: string;
   updated_at: string;
 }

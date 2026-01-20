@@ -8,7 +8,14 @@ import { saveFile, deleteFile } from '../utils/upload';
 // Products handlers
 export const getProducts = async (c: Context) => {
   const result = await pool.query(
-    'SELECT p.*, u.name as user_name, u.email as user_email FROM products p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC'
+    `SELECT p.*, 
+     u.name as user_name, 
+     u.username as user_username, 
+     u.email as user_email,
+     u.avatar_url as user_avatar_url
+     FROM products p 
+     JOIN users u ON p.user_id = u.id 
+     ORDER BY p.created_at DESC`
   );
   return c.json({ products: result.rows });
 };
@@ -16,7 +23,14 @@ export const getProducts = async (c: Context) => {
 export const getProduct = async (c: Context) => {
   const id = c.req.param('id');
   const result = await pool.query(
-    'SELECT p.*, u.name as user_name, u.email as user_email FROM products p JOIN users u ON p.user_id = u.id WHERE p.id = $1',
+    `SELECT p.*, 
+     u.name as user_name, 
+     u.username as user_username, 
+     u.email as user_email,
+     u.avatar_url as user_avatar_url
+     FROM products p 
+     JOIN users u ON p.user_id = u.id 
+     WHERE p.id = $1`,
     [id]
   );
 
@@ -155,7 +169,14 @@ export const deleteProduct = async (c: Context) => {
 // Articles handlers
 export const getArticles = async (c: Context) => {
   const result = await pool.query(
-    'SELECT a.*, u.name as user_name, u.email as user_email FROM articles a JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC'
+    `SELECT a.*, 
+     u.name as user_name, 
+     u.username as user_username, 
+     u.email as user_email,
+     u.avatar_url as user_avatar_url
+     FROM articles a 
+     JOIN users u ON a.user_id = u.id 
+     ORDER BY a.created_at DESC`
   );
   return c.json({ articles: result.rows });
 };
@@ -163,7 +184,14 @@ export const getArticles = async (c: Context) => {
 export const getArticle = async (c: Context) => {
   const id = c.req.param('id');
   const result = await pool.query(
-    'SELECT a.*, u.name as user_name, u.email as user_email FROM articles a JOIN users u ON a.user_id = u.id WHERE a.id = $1',
+    `SELECT a.*, 
+     u.name as user_name, 
+     u.username as user_username, 
+     u.email as user_email,
+     u.avatar_url as user_avatar_url
+     FROM articles a 
+     JOIN users u ON a.user_id = u.id 
+     WHERE a.id = $1`,
     [id]
   );
 

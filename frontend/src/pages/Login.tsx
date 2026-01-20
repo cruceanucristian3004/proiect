@@ -20,7 +20,11 @@ export default function Login() {
       await login(email, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'A apărut o eroare la login');
+      // Extrage mesajul de eroare din răspuns
+      const errorMessage = err.response?.data?.error || 
+                          err.message || 
+                          'Email sau parolă incorectă. Te rugăm să încerci din nou.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

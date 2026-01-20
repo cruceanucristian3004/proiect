@@ -38,7 +38,7 @@
 .logo-image {
   height: 50px;
   width: auto;
-  filter: invert(1); /* Invert to white for dark theme */
+  /* No filter needed - logo is already white */
   transition: transform 0.3s ease;
 }
 

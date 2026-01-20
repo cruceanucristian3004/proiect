@@ -104,6 +104,10 @@ app.get('/', (c: Context) => {
   return c.json({ message: 'API is running', version: '1.0.0' });
 });
 
+app.get('/api/health', (c: Context) => {
+  return c.json({ status: 'ok', message: 'API is healthy' });
+});
+
 // Auth routes (public)
 app.post('/api/auth/register', async (c: Context) => {
   // #region agent log
@@ -123,21 +127,21 @@ app.get('/api/auth/profile', authMiddleware, getProfile);
 app.put('/api/auth/profile', authMiddleware, updateProfile);
 app.post('/api/auth/avatar', authMiddleware, uploadAvatar);
 
-// Products routes
-app.get('/api/products', async (c: Context) => {
+// Products routes (autentificare necesară pentru a vedea produsele)
+app.get('/api/products', authMiddleware, async (c: Context) => {
   // #region agent log
   log({location:'backend/src/index.ts:68',message:'Get products endpoint hit',data:{path:c.req.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'});
   // #endregion
   return getProducts(c);
 });
-app.get('/api/products/:id', getProduct);
+app.get('/api/products/:id', authMiddleware, getProduct);
 app.post('/api/products', authMiddleware, createProduct);
 app.put('/api/products/:id', authMiddleware, updateProduct);
 app.delete('/api/products/:id', authMiddleware, deleteProduct);
 
-// Articles routes
-app.get('/api/articles', getArticles);
-app.get('/api/articles/:id', getArticle);
+// Articles routes (autentificare necesară pentru a vedea articolele)
+app.get('/api/articles', authMiddleware, getArticles);
+app.get('/api/articles/:id', authMiddleware, getArticle);
 app.post('/api/articles', authMiddleware, createArticle);
 app.put('/api/articles/:id', authMiddleware, updateArticle);
 app.delete('/api/articles/:id', authMiddleware, deleteArticle);

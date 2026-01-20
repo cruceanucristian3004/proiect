@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { productsAPI, Product } from '../api/products';
+import { getImageUrl } from '../utils/config';
+import { useProtectedRoute } from '../hooks/useProtectedRoute';
 import './Products.css';
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated, isAdmin, user } = useAuth();
+  
+  // Necesită autentificare pentru a vedea produsele
+  useProtectedRoute();
 
   useEffect(() => {
-    loadProducts();
-  }, []);
+    if (isAuthenticated) {
+      loadProducts();
+    }
+  }, [isAuthenticated]);
 
   const loadProducts = async () => {
     try {
@@ -66,7 +73,7 @@ export default function Products() {
               <div key={product.id} className="product-card">
                 {product.image_url && (
                   <img
-                    src={`http://localhost:3000${product.image_url}`}
+                    src={getImageUrl(product.image_url) || ''}
                     alt={product.name}
                     className="product-image"
                   />
@@ -77,7 +84,18 @@ export default function Products() {
                   </h3>
                   <p className="product-description">{product.description}</p>
                   <p className="product-price">{product.price} RON</p>
-                  <p className="product-author">de {product.user_name}</p>
+                  <div className="product-author">
+                    {product.user_avatar_url && (
+                      <img
+                        src={getImageUrl(product.user_avatar_url) || ''}
+                        alt={product.user_username || product.user_name}
+                        className="author-avatar"
+                      />
+                    )}
+                    <span>
+                      de <strong>{product.user_username || product.user_name}</strong>
+                    </span>
+                  </div>
                   {isAuthenticated && (product.user_id === user?.id || isAdmin) && (
                     <div className="product-actions">
                       <Link

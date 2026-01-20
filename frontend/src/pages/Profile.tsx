@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../api/auth';
+import { getImageUrl } from '../utils/config';
 import './Profile.css';
 
 export default function Profile() {
@@ -111,7 +112,7 @@ export default function Profile() {
     return <div className="error">Nu ești autentificat</div>;
   }
 
-  const displayAvatar = pendingAvatar || (user.avatar_url ? `http://localhost:3000${user.avatar_url}` : null);
+  const displayAvatar = pendingAvatar || getImageUrl(user.avatar_url);
 
   return (
     <div className="profile-page">

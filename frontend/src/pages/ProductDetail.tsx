@@ -2,18 +2,25 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { productsAPI, Product } from '../api/products';
+import { getImageUrl } from '../utils/config';
+import { useProtectedRoute } from '../hooks/useProtectedRoute';
 import './Detail.css';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  
+  // Necesită autentificare
+  useProtectedRoute();
 
   useEffect(() => {
-    if (id) loadProduct();
-  }, [id]);
+    if (id && isAuthenticated) {
+      loadProduct();
+    }
+  }, [id, isAuthenticated]);
 
   const loadProduct = async () => {
     try {
@@ -52,7 +59,7 @@ export default function ProductDetail() {
         <div className="detail-card">
           {product.image_url && (
             <img
-              src={`http://localhost:3000${product.image_url}`}
+              src={getImageUrl(product.image_url) || ''}
               alt={product.name}
               className="detail-image"
             />
@@ -66,10 +73,26 @@ export default function ProductDetail() {
                 <p>{product.description}</p>
               </div>
             )}
-            <p className="detail-meta">
-              Adăugat de {product.user_name} pe{' '}
-              {new Date(product.created_at).toLocaleDateString('ro-RO')}
-            </p>
+            <div className="detail-meta">
+              <div className="detail-author">
+                {product.user_avatar_url && (
+                  <img
+                    src={getImageUrl(product.user_avatar_url) || ''}
+                    alt={product.user_username || product.user_name}
+                    className="author-avatar-large"
+                  />
+                )}
+                <div className="author-info">
+                  <span className="author-label">Publicat de</span>
+                  <strong className="author-name">
+                    {product.user_username || product.user_name}
+                  </strong>
+                  <span className="author-date">
+                    pe {new Date(product.created_at).toLocaleDateString('ro-RO')}
+                  </span>
+                </div>
+              </div>
+            </div>
             {user && (product.user_id === user.id || isAdmin) && (
               <div className="detail-actions">
                 <Link

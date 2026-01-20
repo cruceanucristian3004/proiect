@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { productsAPI, Product } from '../api/products';
+import { getImageUrl } from '../utils/config';
 import './Form.css';
 
 export default function ProductForm() {
@@ -41,7 +42,7 @@ export default function ProductForm() {
         price: product.price.toString(),
       });
       if (product.image_url) {
-        setPreviewUrl(`http://localhost:3000${product.image_url}`);
+        setPreviewUrl(getImageUrl(product.image_url) || '');
       }
     } catch (error: any) {
       setError(error.response?.data?.error || 'Eroare la încărcare');

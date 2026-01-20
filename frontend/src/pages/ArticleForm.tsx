@@ -2,6 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { articlesAPI, Article } from '../api/articles';
+import { getImageUrl } from '../utils/config';
 import './Form.css';
 
 export default function ArticleForm() {
@@ -39,7 +40,7 @@ export default function ArticleForm() {
         content: article.content,
       });
       if (article.image_url) {
-        setPreviewUrl(`http://localhost:3000${article.image_url}`);
+        setPreviewUrl(getImageUrl(article.image_url) || '');
       }
     } catch (error: any) {
       setError(error.response?.data?.error || 'Eroare la încărcare');

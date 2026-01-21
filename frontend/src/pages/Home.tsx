@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './Home.css';
 
 // Counter animation for stats
@@ -25,6 +25,9 @@ const animateCounter = (element: HTMLElement, target: number) => {
 export default function Home() {
   const { isAuthenticated, isAdmin } = useAuth();
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const footerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const observerOptions = {
@@ -60,6 +63,33 @@ export default function Home() {
     };
   }, []);
 
+  // Scroll handler pentru animația textului și detectarea sfârșitului paginii
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+
+      // Verifică dacă utilizatorul este aproape de finalul paginii
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPercentage = (currentScrollY + windowHeight) / documentHeight;
+      
+      // Activează animația când utilizatorul ajunge la 95% din pagină
+      if (scrollPercentage >= 0.95) {
+        setIsScrolledToBottom(true);
+      } else {
+        setIsScrolledToBottom(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Verifică poziția inițială
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const setRef = (index: number) => (el: HTMLElement | null) => {
     sectionsRef.current[index] = el;
   };
@@ -71,11 +101,14 @@ export default function Home() {
         <div className="container">
           <div className="hero">
             <h1 className="hero-title">
-              <span className="graffiti-text">
+              <span className={`graffiti-text ${isScrolledToBottom ? 'hidden' : ''}`}>
                 <span className="graffiti-word graffiti-nova">NOVA</span>
                 <span className="graffiti-word graffiti-resells">RESELLS</span>
               </span>
             </h1>
+            <p className="hero-slogan">
+              Hard to find, easy to flex
+            </p>
             <p className="hero-subtitle">
               Platforma ta preferată pentru resells! Cumpără și vinde produse cu încredere. 
               Descoperă cele mai bune oferte și gestionează-vânzările într-un mod simplu și eficient.
@@ -132,19 +165,19 @@ export default function Home() {
             </p>
           </div>
           <div className="features">
-            <div className="feature-card">
-              <div className="feature-icon">🔐</div>
-              <h2>Autentificare Securizată</h2>
-              <p>
-                Sistem robust de autentificare cu JWT, hash bcrypt și roluri multiple. 
-                Protecție completă pentru datele tale.
-              </p>
-              {!isAuthenticated && (
+            {!isAuthenticated && (
+              <div className="feature-card">
+                <div className="feature-icon">🔐</div>
+                <h2>Autentificare Securizată</h2>
+                <p>
+                  Sistem robust de autentificare cu JWT, hash bcrypt și roluri multiple. 
+                  Protecție completă pentru datele tale.
+                </p>
                 <Link to="/register" className="btn btn-primary" style={{ marginTop: '1rem' }}>
                   Începe acum
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
             <Link to="/products" className="feature-card" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="feature-icon">📦</div>
               <h2>Resell Produse</h2>
@@ -251,6 +284,17 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Footer with merged text animation */}
+      <footer ref={footerRef} className="footer-section">
+        <div className="container">
+          <div className={`footer-graffiti-text ${isScrolledToBottom ? 'active' : ''}`}>
+            <span className="footer-graffiti-word footer-nova">NOVA</span>
+            <span className="footer-graffiti-word footer-resells">RESELLS</span>
+            <span className="footer-graffiti-word footer-merged">Nova Resells</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

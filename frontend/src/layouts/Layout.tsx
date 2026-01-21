@@ -1,10 +1,12 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getImageUrl } from '../utils/config';
 import './Layout.css';
 
 export default function Layout() {
   const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -22,11 +24,27 @@ export default function Layout() {
               <span className="logo-text">Nova Resells</span>
             </Link>
             <div className="nav-links">
-              <Link to="/products">Produse</Link>
-              <Link to="/articles">Articole</Link>
+              <div className="language-selector">
+                <button
+                  className={`lang-btn ${language === 'ro' ? 'active' : ''}`}
+                  onClick={() => setLanguage('ro')}
+                  title="Română"
+                >
+                  RO
+                </button>
+                <button
+                  className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+                  onClick={() => setLanguage('en')}
+                  title="English"
+                >
+                  EN
+                </button>
+              </div>
+              <Link to="/products">{t('nav.products')}</Link>
+              <Link to="/articles">{t('nav.articles')}</Link>
               {isAuthenticated ? (
                 <>
-                  <Link to="/profile">Profil</Link>
+                  <Link to="/profile">{t('nav.profile')}</Link>
                   <div className="user-profile">
                     <Link to="/profile" className="user-avatar-link">
                       {user?.avatar_url ? (
@@ -43,15 +61,15 @@ export default function Layout() {
                     </Link>
                     <span className="user-info">{user?.username || user?.name}</span>
                   </div>
-                  {isAdmin && <span className="admin-badge">Admin</span>}
+                  {isAdmin && <span className="admin-badge">{t('nav.admin')}</span>}
                   <button onClick={handleLogout} className="btn-logout">
-                    Logout
+                    {t('nav.logout')}
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login">Login</Link>
-                  <Link to="/register">Register</Link>
+                  <Link to="/login">{t('nav.login')}</Link>
+                  <Link to="/register">{t('nav.register')}</Link>
                 </>
               )}
             </div>
@@ -63,7 +81,7 @@ export default function Layout() {
       </main>
       <footer className="footer">
         <div className="container">
-          <p>&copy; 2026 Nova Resells. Toate drepturile rezervate.</p>
+          <p>&copy; 2026 Nova Resells. {t('footer.copyright')}</p>
         </div>
       </footer>
     </div>

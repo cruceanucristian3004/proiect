@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { productsAPI, Product } from '../api/products';
 import { getImageUrl } from '../utils/config';
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
@@ -11,6 +12,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, isAdmin, isAuthenticated } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   
   // Necesită autentificare
@@ -34,28 +36,30 @@ export default function ProductDetail() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Sigur vrei să ștergi acest produs?')) return;
+    if (!window.confirm(t('products.deleteConfirm'))) return;
 
     try {
       await productsAPI.delete(id!);
       navigate('/products');
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Eroare la ștergere');
+      alert(error.response?.data?.error || t('products.deleteError'));
     }
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">{t('products.loading')}</div>;
   }
 
   if (!product) {
-    return <div className="error">Produsul nu a fost găsit</div>;
+    return <div className="error">{t('products.notFound')}</div>;
   }
+
+  const dateLocale = language === 'ro' ? 'ro-RO' : 'en-US';
 
   return (
     <div className="detail-page">
       <div className="container">
-        <Link to="/products" className="back-link">← Înapoi la Produse</Link>
+        <Link to="/products" className="back-link">{t('products.back')}</Link>
         <div className="detail-card">
           {product.image_url && (
             <img
@@ -69,7 +73,7 @@ export default function ProductDetail() {
             <p className="detail-price">{product.price} RON</p>
             {product.description && (
               <div className="detail-description">
-                <h3>Descriere</h3>
+                <h3>{t('products.description')}</h3>
                 <p>{product.description}</p>
               </div>
             )}
@@ -83,12 +87,12 @@ export default function ProductDetail() {
                   />
                 )}
                 <div className="author-info">
-                  <span className="author-label">Publicat de</span>
+                  <span className="author-label">{t('products.publishedBy')}</span>
                   <strong className="author-name">
                     {product.user_username || product.user_name}
                   </strong>
                   <span className="author-date">
-                    pe {new Date(product.created_at).toLocaleDateString('ro-RO')}
+                    {t('products.publishedOn')} {new Date(product.created_at).toLocaleDateString(dateLocale)}
                   </span>
                 </div>
               </div>
@@ -99,10 +103,10 @@ export default function ProductDetail() {
                   to={`/products/${product.id}/edit`}
                   className="btn btn-primary"
                 >
-                  Edit
+                  {t('products.edit')}
                 </Link>
                 <button onClick={handleDelete} className="btn btn-danger">
-                  Șterge
+                  {t('products.delete')}
                 </button>
               </div>
             )}

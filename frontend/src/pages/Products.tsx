@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { productsAPI, Product } from '../api/products';
 import { getImageUrl } from '../utils/config';
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
@@ -10,6 +11,7 @@ export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated, isAdmin, user } = useAuth();
+  const { t } = useLanguage();
   
   // Necesită autentificare pentru a vedea produsele
   useProtectedRoute();
@@ -32,38 +34,38 @@ export default function Products() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Sigur vrei să ștergi acest produs?')) return;
+    if (!window.confirm(t('products.deleteConfirm'))) return;
 
     try {
       await productsAPI.delete(id);
       setProducts(products.filter((p) => p.id !== id));
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Eroare la ștergere');
+      alert(error.response?.data?.error || t('products.deleteError'));
     }
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">{t('products.loading')}</div>;
   }
 
   return (
     <div className="products-page">
       <div className="container">
         <div className="page-header">
-          <h1>Produse</h1>
+          <h1>{t('products.title')}</h1>
           {isAuthenticated && (
             <Link to="/products/new" className="btn btn-primary">
-              + Adaugă Produs
+              {t('products.add')}
             </Link>
           )}
         </div>
 
         {products.length === 0 ? (
           <div className="empty-state">
-            <p>Nu există produse încă.</p>
+            <p>{t('products.empty')}</p>
             {isAuthenticated && (
               <Link to="/products/new" className="btn btn-primary">
-                Adaugă primul produs
+                {t('products.addFirst')}
               </Link>
             )}
           </div>
@@ -93,7 +95,7 @@ export default function Products() {
                       />
                     )}
                     <span>
-                      de <strong>{product.user_username || product.user_name}</strong>
+                      {t('products.publishedBy')} <strong>{product.user_username || product.user_name}</strong>
                     </span>
                   </div>
                   {isAuthenticated && (product.user_id === user?.id || isAdmin) && (
@@ -102,13 +104,13 @@ export default function Products() {
                         to={`/products/${product.id}/edit`}
                         className="btn btn-secondary"
                       >
-                        Edit
+                        {t('products.edit')}
                       </Link>
                       <button
                         onClick={() => handleDelete(product.id)}
                         className="btn btn-danger"
                       >
-                        Șterge
+                        {t('products.delete')}
                       </button>
                     </div>
                   )}

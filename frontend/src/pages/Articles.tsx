@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { articlesAPI, Article } from '../api/articles';
 import { getImageUrl } from '../utils/config';
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
@@ -10,6 +11,7 @@ export default function Articles() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated, isAdmin, user } = useAuth();
+  const { t, language } = useLanguage();
   
   // Necesită autentificare pentru a vedea articolele
   useProtectedRoute();
@@ -32,38 +34,38 @@ export default function Articles() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Sigur vrei să ștergi acest articol?')) return;
+    if (!window.confirm(t('articles.deleteConfirm'))) return;
 
     try {
       await articlesAPI.delete(id);
       setArticles(articles.filter((a) => a.id !== id));
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Eroare la ștergere');
+      alert(error.response?.data?.error || t('articles.deleteError'));
     }
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">{t('articles.loading')}</div>;
   }
 
   return (
     <div className="articles-page">
       <div className="container">
         <div className="page-header">
-          <h1>Articole</h1>
+          <h1>{t('articles.title')}</h1>
           {isAuthenticated && (
             <Link to="/articles/new" className="btn btn-primary">
-              + Scrie Articol
+              {t('articles.add')}
             </Link>
           )}
         </div>
 
         {articles.length === 0 ? (
           <div className="empty-state">
-            <p>Nu există articole încă.</p>
+            <p>{t('articles.empty')}</p>
             {isAuthenticated && (
               <Link to="/articles/new" className="btn btn-primary">
-                Scrie primul articol
+                {t('articles.addFirst')}
               </Link>
             )}
           </div>
@@ -94,10 +96,10 @@ export default function Articles() {
                       />
                     )}
                     <span>
-                      de <strong>{article.user_username || article.user_name}</strong>
+                      {t('articles.publishedBy')} <strong>{article.user_username || article.user_name}</strong>
                     </span>
                     <span>•</span>
-                    <span>{new Date(article.created_at).toLocaleDateString('ro-RO')}</span>
+                    <span>{new Date(article.created_at).toLocaleDateString(language === 'ro' ? 'ro-RO' : 'en-US')}</span>
                   </div>
                   {isAuthenticated && (article.user_id === user?.id || isAdmin) && (
                     <div className="article-actions">
@@ -105,13 +107,13 @@ export default function Articles() {
                         to={`/articles/${article.id}/edit`}
                         className="btn btn-secondary"
                       >
-                        Edit
+                        {t('articles.edit')}
                       </Link>
                       <button
                         onClick={() => handleDelete(article.id)}
                         className="btn btn-danger"
                       >
-                        Șterge
+                        {t('articles.delete')}
                       </button>
                     </div>
                   )}

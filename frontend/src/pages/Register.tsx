@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import './Auth.css';
 
 export default function Register() {
@@ -11,6 +12,7 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -25,7 +27,7 @@ export default function Register() {
       // Extrage mesajul de eroare din răspuns
       const errorMessage = err.response?.data?.error || 
                           err.message || 
-                          'A apărut o eroare la înregistrare. Te rugăm să încerci din nou.';
+                          t('auth.register.error');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -36,11 +38,11 @@ export default function Register() {
     <div className="auth-page">
       <div className="container">
         <div className="auth-card">
-          <h1>Înregistrare</h1>
+          <h1>{t('auth.register.title')}</h1>
           {error && <div className="error-message">{error}</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Nume</label>
+              <label htmlFor="name">{t('auth.register.name')}</label>
               <input
                 type="text"
                 id="name"
@@ -51,7 +53,7 @@ export default function Register() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="username">Username (opțional)</label>
+              <label htmlFor="username">{t('auth.register.username')}</label>
               <input
                 type="text"
                 id="username"
@@ -63,11 +65,11 @@ export default function Register() {
                 placeholder="ion_popescu"
               />
               <small style={{ color: '#7f8c8d', fontSize: '0.85rem' }}>
-                Doar litere, cifre și underscore
+                {t('auth.register.usernameHint')}
               </small>
             </div>
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t('auth.register.email')}</label>
               <input
                 type="email"
                 id="email"
@@ -78,7 +80,7 @@ export default function Register() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{t('auth.register.password')}</label>
               <input
                 type="password"
                 id="password"
@@ -90,11 +92,11 @@ export default function Register() {
               />
             </div>
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? 'Loading...' : 'Înregistrează-te'}
+              {loading ? t('auth.register.loading') : t('auth.register.submit')}
             </button>
           </form>
           <p className="auth-link">
-            Ai deja cont? <Link to="/login">Login</Link>
+            {t('auth.register.hasAccount')} <Link to="/login">{t('nav.login')}</Link>
           </p>
         </div>
       </div>

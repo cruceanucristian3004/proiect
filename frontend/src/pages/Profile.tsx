@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { authAPI } from '../api/auth';
 import { getImageUrl } from '../utils/config';
 import './Profile.css';
 
 export default function Profile() {
   const { user, logout, updateUser } = useAuth();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -42,7 +44,7 @@ export default function Profile() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setError('Fișierul trebuie să fie o imagine');
+      setError(t('profile.avatar.error'));
       return;
     }
 
@@ -83,10 +85,10 @@ export default function Profile() {
         updateUser(profileResponse.user);
       }
 
-      setSuccess('Profil actualizat cu succes!');
+      setSuccess(t('profile.success'));
       setHasChanges(false);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Eroare la actualizarea profilului');
+      setError(err.response?.data?.error || t('profile.error'));
     } finally {
       setLoading(false);
     }
@@ -109,7 +111,7 @@ export default function Profile() {
   };
 
   if (!user) {
-    return <div className="error">Nu ești autentificat</div>;
+    return <div className="error">{t('profile.notAuthenticated')}</div>;
   }
 
   const displayAvatar = pendingAvatar || getImageUrl(user.avatar_url);
@@ -118,7 +120,7 @@ export default function Profile() {
     <div className="profile-page">
       <div className="container">
         <div className="profile-card">
-          <h1>Profil</h1>
+          <h1>{t('profile.title')}</h1>
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
           
@@ -145,14 +147,14 @@ export default function Profile() {
                   id="avatar-input"
                 />
                 <label htmlFor="avatar-input" className="btn btn-secondary">
-                  Schimbă Avatar
+                  {t('profile.avatar.change')}
                 </label>
               </div>
             </div>
 
             <div className="profile-info">
               <div className="form-group">
-                <label htmlFor="profile-name">Nume *</label>
+                <label htmlFor="profile-name">{t('profile.name')} *</label>
                 <input
                   type="text"
                   id="profile-name"
@@ -163,7 +165,7 @@ export default function Profile() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="profile-username">Username</label>
+                <label htmlFor="profile-username">{t('profile.username')}</label>
                 <input
                   type="text"
                   id="profile-username"
@@ -175,17 +177,17 @@ export default function Profile() {
                   placeholder="ion_popescu"
                 />
                 <small>
-                  Doar litere, cifre și underscore
+                  {t('profile.usernameHint')}
                 </small>
               </div>
               <div className="info-row">
-                <strong>Email:</strong>
+                <strong>{t('profile.email')}:</strong>
                 <span>{user.email}</span>
               </div>
               <div className="info-row">
-                <strong>Rol:</strong>
+                <strong>{t('profile.role')}:</strong>
                 <span className={user.role === 'admin' ? 'admin-role' : ''}>
-                  {user.role === 'admin' ? 'Admin' : 'User'}
+                  {user.role === 'admin' ? t('profile.role.admin') : t('profile.role.user')}
                 </span>
               </div>
             </div>
@@ -194,16 +196,16 @@ export default function Profile() {
           {hasChanges && (
             <div className="profile-actions">
               <button onClick={handleSaveChanges} className="btn btn-primary" disabled={loading}>
-                {loading ? 'Salvare...' : 'Salvează Modificările'}
+                {loading ? t('profile.saving') : t('profile.save')}
               </button>
               <button onClick={handleCancel} className="btn btn-secondary" disabled={loading}>
-                Anulează
+                {t('profile.cancel')}
               </button>
             </div>
           )}
 
           <button onClick={logout} className="btn btn-danger" style={{ marginTop: '1rem', width: '100%' }}>
-            Logout
+            {t('nav.logout')}
           </button>
         </div>
       </div>

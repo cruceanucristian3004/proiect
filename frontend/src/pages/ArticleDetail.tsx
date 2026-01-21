@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { articlesAPI, Article } from '../api/articles';
 import { getImageUrl } from '../utils/config';
 import { useProtectedRoute } from '../hooks/useProtectedRoute';
@@ -11,6 +12,7 @@ export default function ArticleDetail() {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, isAdmin, isAuthenticated } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   
   // Necesită autentificare
@@ -34,28 +36,30 @@ export default function ArticleDetail() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Sigur vrei să ștergi acest articol?')) return;
+    if (!window.confirm(t('articles.deleteConfirm'))) return;
 
     try {
       await articlesAPI.delete(id!);
       navigate('/articles');
     } catch (error: any) {
-      alert(error.response?.data?.error || 'Eroare la ștergere');
+      alert(error.response?.data?.error || t('articles.deleteError'));
     }
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">{t('articles.loading')}</div>;
   }
 
   if (!article) {
-    return <div className="error">Articolul nu a fost găsit</div>;
+    return <div className="error">{t('articles.notFound')}</div>;
   }
+
+  const dateLocale = language === 'ro' ? 'ro-RO' : 'en-US';
 
   return (
     <div className="detail-page">
       <div className="container">
-        <Link to="/articles" className="back-link">← Înapoi la Articole</Link>
+        <Link to="/articles" className="back-link">{t('articles.back')}</Link>
         <div className="detail-card">
           {article.image_url && (
             <img
@@ -79,12 +83,12 @@ export default function ArticleDetail() {
                   />
                 )}
                 <div className="author-info">
-                  <span className="author-label">Scris de</span>
+                  <span className="author-label">{t('articles.writtenBy')}</span>
                   <strong className="author-name">
                     {article.user_username || article.user_name}
                   </strong>
                   <span className="author-date">
-                    pe {new Date(article.created_at).toLocaleDateString('ro-RO')}
+                    {t('articles.publishedOn')} {new Date(article.created_at).toLocaleDateString(dateLocale)}
                   </span>
                 </div>
               </div>
@@ -95,10 +99,10 @@ export default function ArticleDetail() {
                   to={`/articles/${article.id}/edit`}
                   className="btn btn-primary"
                 >
-                  Edit
+                  {t('articles.edit')}
                 </Link>
                 <button onClick={handleDelete} className="btn btn-danger">
-                  Șterge
+                  {t('articles.delete')}
                 </button>
               </div>
             )}

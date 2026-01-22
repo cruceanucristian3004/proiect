@@ -8,7 +8,10 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "init-db": "node scripts/init-db.js"
+    "init-db": "node scripts/init-db.js",
+    "wipe-db": "node scripts/wipe-db.js",
+    "set-admin": "node scripts/set-admin.js",
+    "migrate": "node scripts/run-migration.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.12.0",

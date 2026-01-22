@@ -117,7 +117,7 @@ export const login = async (c: Context) => {
 
     const user = result.rows[0];
 
-    // Verifică password
+    // Verifică parola
     const isValid = await comparePassword(validated.password, user.password);
     if (!isValid) {
       return c.json({ error: 'Invalid email or password' }, 401);
